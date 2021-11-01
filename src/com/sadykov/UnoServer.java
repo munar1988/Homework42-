@@ -1,32 +1,21 @@
 package com.sadykov;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class UnoServer {
 
-    public void run() {
-        int port = 0;
-        try (ServerSocket server = new ServerSocket(port)) {
-            while (!server.isClosed()) {
-                Socket clientSocket = server.accept();
-                AbstractExecutorService pool = null;
-                pool.submit(() -> handle(clientSocket));
-            }
-        } catch (IOException e) {
-            String formatMsg = "Veroyatnee vsego port %s zanyat.%n";
-            System.out.printf(formatMsg, port);
-            e.printStackTrace();
-        }
+    private static int response;
+    private final String END_WORLD = "bye";
+    private String handle;
+
+    public UnoServer(String handle) {
+        this.handle = handle;
     }
 
-    private void handle(Socket clientSocket) {
+    public static void handle(Socket clientSocket) {
         System.out.printf("Client connected: %s%n", clientSocket);
         try (clientSocket;
              Scanner reader = getReader(clientSocket);
@@ -44,7 +33,7 @@ public class UnoServer {
         }
     }
 
-    private void sendResponse(String response, Writer writer) throws IOException {
+    private static void sendResponse(String response, Writer writer) throws IOException {
         writer.write(response);
         writer.write(System.lineSeparator());
         writer.flush();
@@ -61,15 +50,14 @@ public class UnoServer {
         return new Scanner(input);
     }
 
-    private boolean isQuitMsg(String message) {
+    private static boolean isQuitMsg(String message) {
         return "bye".equalsIgnoreCase(message);
     }
 
-    private boolean isEmptyMsg(String message) {
+    private static boolean isEmptyMsg(String message) {
         return message == null || message.isBlank();
     }
 }
-
 
 
 
